@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Faculty {
+  id            Int          @id @default(autoincrement())
+  name          String
+  email         String       @unique
+  facultyId     String       @unique
+  courses       Course[]     // Relation to Courses
+  mentees       Student[]    @relation("Mentorship")
+  attendanceLogs AttendanceLog[]
+
+  @@index([email], map: "Faculty_email_index")
+}
+
+model Course {
+  id         Int      @id @default(autoincrement())
+  subject    String
+  semester   Int
+  section    String
+  facultyId  Int?                     // Nullable due to SetNull
+  faculty    Faculty?                 @relation(fields: [facultyId], references: [id], onDelete: SetNull)
+  classes    Class[]
+  AttendanceLog AttendanceLog[]
+
+  @@index([facultyId], map: "Course_facultyId_index")
+}
+
+model Class {
+  id          Int          @id @default(autoincrement())
+  date        DateTime
+  courseId    Int
+  course      Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  attendances Attendance[]
+
+  @@index([courseId], map: "Class_courseId_index")
+}
+
+model Attendance {
+  id            Int      @id @default(autoincrement())
+  date          DateTime
+  status        Boolean
+  studentId     Int
+  classId       Int
+  class         Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
+  student       Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, classId, date])
+  @@index([classId], map: "Attendance_classId_index")
+}
+
+model AttendanceLog {
+  id          Int        @id @default(autoincrement())
+  date        DateTime
+  facultyId   Int?                     // Nullable due to SetNull
+  faculty     Faculty?                 @relation(fields: [facultyId], references: [id], onDelete: SetNull)
+  courseId    Int
+  course      Course     @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  section     String
+  action      String     // e.g., "Marked Attendance", "Viewed Attendance Report"
+
+  @@index([facultyId, courseId, date], map: "AttendanceLog_faculty_course_date_index")
+}
+
+model Student {
+  id                   Int          @id @default(autoincrement())
+  usn                  String       @unique
+  name                 String
+  mentorId             Int?                     // Nullable due to SetNull
+  mentor               Faculty?                 @relation("Mentorship", fields: [mentorId], references: [id], onDelete: SetNull)
+  classesHeld          Int
+  classesAttended      Int
+  attendancePercentage Float
+  status               Boolean
+  department           String
+  semester             Int
+  section              String
+  subjects             Json
+  dob                  DateTime
+  email                String       @unique
+  contactNo            String
+  attendances          Attendance[]
+
+  @@index([mentorId], map: "Student_mentorId_index")
+}
