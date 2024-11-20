@@ -27,8 +27,11 @@ model Course {
   facultyId  Int?                     // Nullable due to SetNull
   faculty    Faculty?                 @relation(fields: [facultyId], references: [id], onDelete: SetNull)
   classes    Class[]
-  AttendanceLog AttendanceLog[]
-
+  attendanceLogs AttendanceLog[]
+  
+  // Explicit relation to join model
+  students   StudentCourse[] // Changed from Student[] to StudentCourse[]
+  
   @@index([facultyId], map: "Course_facultyId_index")
 }
 
@@ -74,18 +77,38 @@ model Student {
   name                 String
   mentorId             Int?                     // Nullable due to SetNull
   mentor               Faculty?                 @relation("Mentorship", fields: [mentorId], references: [id], onDelete: SetNull)
-  classesHeld          Int
-  classesAttended      Int
-  attendancePercentage Float
-  status               Boolean
-  department           String
-  semester             Int
-  section              String
-  subjects             Json
-  dob                  DateTime
-  email                String       @unique
-  contactNo            String
-  attendances          Attendance[]
+  
+   // Tracking attendance statistics
+   classesHeld          Int          @default(0) 
+   classesAttended      Int          @default(0) 
+   attendancePercentage Float
+  
+   status               Boolean
+   department           String
+   semester             Int
+   section              String
+   // Many-to-many relation with courses through join model
+   courses              StudentCourse[] // Changed from Course[] to StudentCourse[]
+   
+   // Additional fields for student information 
+   dob                  DateTime
+   email                String       @unique
+   contactNo            String
+   
+   attendances          Attendance[]
 
-  @@index([mentorId], map: "Student_mentorId_index")
+   @@index([mentorId], map: "Student_mentorId_index")
+}
+
+// Join model for many-to-many relationship between Student and Course
+model StudentCourse {
+    studentId Int 
+    courseId Int
+    
+    student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+    course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+    @@id([studentId, courseId]) // Composite primary key
+
+    @@map("StudentCourses") // Optional mapping to keep the original name in the database if desired.
 }

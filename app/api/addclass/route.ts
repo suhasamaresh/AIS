@@ -6,6 +6,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { date, courseId } = body;
 
+    // Validate the required fields
     if (!date || !courseId) {
       return NextResponse.json(
         { error: "Date and courseId are required fields." },
@@ -13,7 +14,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Create a new class
+    // Create a new class for the specified course
     const newClass = await prisma.class.create({
       data: {
         date: new Date(date),
@@ -21,16 +22,18 @@ export async function POST(request: Request) {
       },
     });
 
-    // Increment classesHeld for all students who have taken the course
+    // Increment classesHeld for all students enrolled in the course
     await prisma.student.updateMany({
       where: {
-        subjects: {
-          array_contains: courseId.toString(), // Assuming `subjects` is an array of course IDs in string format
+        courses: {
+          some: {
+            courseId, // Match students linked to this courseId via the join model
+          },
         },
       },
       data: {
         classesHeld: {
-          increment: 1,
+          increment: 1, // Increment classesHeld by 1
         },
       },
     });
