@@ -1,46 +1,44 @@
 import { NextResponse } from "next/server";
 import prisma from "@/app/lib/db";
 
-export async function POST(request: Request) {
-    try {
-      const body = await request.json();
-      const { studentId, subject } = body;
-  
-      if (!studentId || !subject) {
-        return NextResponse.json(
-          { error: "studentId and subject are required fields." },
-          { status: 400 }
-        );
-      }
-  
-      // Fetch the student to update their subjects
-      const student = await prisma.student.findUnique({
-        where: { id: studentId },
-      });
-  
-      if (!student) {
-        return NextResponse.json(
-          { error: `Student with id ${studentId} does not exist.` },
-          { status: 404 }
-        );
-      }
-  
-      // Add the new subject to the student's subjects array
-      const updatedSubjects = [...(student.subjects as string[]), subject];
-  
-      // Update the student record in the database
-      const updatedStudent = await prisma.student.update({
-        where: { id: studentId },
-        data: { subjects: updatedSubjects },
-      });
-  
-      return NextResponse.json(updatedStudent, { status: 200 });
-    } catch (error) {
-      console.error("Error adding subject to student:", error);
+export async function GET(request: Request) {
+  try {
+    // Parse query parameters
+    const { searchParams } = new URL(request.url);
+    const courseId = searchParams.get("courseId");
+
+    // Validate courseId
+    if (!courseId) {
       return NextResponse.json(
-        { error: "Failed to add subject to student." },
-        { status: 500 }
+        { error: "courseId is required as a query parameter." },
+        { status: 400 }
       );
     }
+
+    // Fetch students enrolled in the course
+    const students = await prisma.student.findMany({
+      where: {
+        courses: {
+          some: {
+            courseId: Number(courseId), // Ensure courseId is numeric
+          },
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        usn: true,
+        email: true,
+        status: true,
+      },
+    });
+
+    return NextResponse.json(students, { status: 200 });
+  } catch (error) {
+    console.error("Error fetching students for the course:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch students for the specified course." },
+      { status: 500 }
+    );
   }
-  
+}

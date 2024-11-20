@@ -23,12 +23,10 @@ export async function POST(request: Request) {
     });
 
     // Increment classesHeld for all students enrolled in the course
-    await prisma.student.updateMany({
+    await prisma.studentCourse.updateMany({
       where: {
-        courses: {
-          some: {
-            courseId, // Match students linked to this courseId via the join model
-          },
+        course: {
+          id: courseId, // Match students linked to this courseId via the join model
         },
       },
       data: {

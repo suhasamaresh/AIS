@@ -78,10 +78,7 @@ model Student {
   mentorId             Int?                     // Nullable due to SetNull
   mentor               Faculty?                 @relation("Mentorship", fields: [mentorId], references: [id], onDelete: SetNull)
   
-   // Tracking attendance statistics
-   classesHeld          Int          @default(0) 
-   classesAttended      Int          @default(0) 
-   attendancePercentage Float
+   
   
    status               Boolean
    department           String
@@ -102,11 +99,16 @@ model Student {
 
 // Join model for many-to-many relationship between Student and Course
 model StudentCourse {
-    studentId Int 
-    courseId Int
+    studentId          Int
+    courseId           Int
     
-    student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
-    course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+    student            Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+    course             Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+    
+    // Fields for tracking attendance per course
+    classesHeld        Int      @default(0)
+    classesAttended    Int      @default(0)
+    attendancePercentage Float   @default(0)
 
     @@id([studentId, courseId]) // Composite primary key
 

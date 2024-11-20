@@ -79,7 +79,7 @@ const Dashboard: React.FC = () => {
                     <Link href="/facultyreport" className="card bg-blue-500 hover:bg-blue-600 text-white rounded-lg p-8 text-center cursor-pointer">
                         <h3 className="text-xl font-semibold">Report</h3>
                     </Link>
-                    <Link href="/faculty/classmanagement" className="card bg-blue-500 hover:bg-blue-600 text-white rounded-lg p-8 text-center cursor-pointer">
+                    <Link href="/classmanagement" className="card bg-blue-500 hover:bg-blue-600 text-white rounded-lg p-8 text-center cursor-pointer">
                         <h3 className="text-xl font-semibold">Class Management</h3>
                     </Link>
                 </div>

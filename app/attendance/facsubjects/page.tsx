@@ -17,7 +17,7 @@ const Page = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await fetch("/api/faculty/classes?facultyId=1", {
+        const response = await fetch("/api/faculty/courses?facultyId=1", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -71,7 +71,7 @@ const Page = () => {
             key={course.id}
             className="course-card p-4 border rounded-lg shadow-lg cursor-pointer hover:bg-gray-100"
             onClick={() =>
-              router.push(`/faculty/exam-details/${course.id}`)
+              router.push(`/attendance/facsubjects/${course.id}`)
             }
           >
             <h3 className="text-xl font-semibold mb-2">{course.subject}</h3>
