@@ -54,50 +54,30 @@ const HorizontalNavbar: React.FC = () => {
             }`}
           >
             {/* Home */}
-            <li className="relative">
-              <Link href="/admission/adm_home">
+            <li className="relative border border-gray-300 rounded hover:border-blue-500">
+              {/* <Link href="/admission/adm_home"> */}
                 <div className="flex items-center space-x-2 cursor-pointer hover:bg-blue-500 py-2 px-2 rounded">
                   <FaHome className="text-sm" />
                   <span className="text-sm">Home</span>
                 </div>
-              </Link>
+              {/* </Link> */}
             </li>
 
-            {/* Student Information */}
-            <li className="relative">
+            {/* my courses */}
+            <li className="relative border border-gray-300 rounded hover:border-blue-500">
               <div
                 className="flex items-center space-x-2 cursor-pointer hover:bg-blue-500 py-2 px-2 rounded"
-                onClick={() => toggleSubmenu("Student_Information")}
+                onClick={() => toggleSubmenu("myCourses")}
               >
                 <PiStudentBold className="text-sm" />
-                <span className="text-sm">Student Information</span>
-                {openMenu === "Student_Information" ? <FaChevronUp /> : <FaChevronDown />}
+                <span className="text-sm">My Courses</span>
+                {openMenu === "myCourses" ? <FaChevronUp /> : <FaChevronDown />}
               </div>
-              {openMenu === "Student_Information" && (
+              {openMenu === "myCourses" && (
                 <ul className="absolute left-0 bg-white text-black mt-2 shadow-lg rounded z-50">
                   {[
-                    { label: "View Master Data", href: "/admission/adm_master_data_fetch" },
-                    { label: "Import From Excel", href: "/admission/adm_import_excel" },
-                    {
-                      label: "Student Information (UG)",
-                      href: "/admission/adm_student_information/ug",
-                    },
-                    {
-                      label: "Student Information (PG)",
-                      href: "/admission/adm_student_information/pg",
-                    },
-                    {
-                      label: "Student Information (WP)",
-                      href: "/admission/adm_student_information/wp",
-                    },
-                    {
-                      label: "Student Information (PhD)",
-                      href: "/admission/adm_student_information/phd",
-                    },
-                    {
-                      label: "Scan Photo",
-                      href: "/admission/adm_scan_photo",
-                    },
+                    { label: "Subjects Hadling", href: "/admission/adm_master_data_fetch" },
+                    { label: "List of Students", href: "/admission/adm_import_excel" },
                   ].map((item) => (
                     <li
                       key={item.label}
@@ -110,23 +90,22 @@ const HorizontalNavbar: React.FC = () => {
               )}
             </li>
 
-            {/* Admission Statistics */}
-            <li className="relative">
+            {/* Student Attendence */}
+            <li className="relative border border-gray-300 rounded hover:border-blue-500">
               <div
                 className="flex items-center space-x-2 cursor-pointer hover:bg-blue-500 py-2 px-2 rounded"
-                onClick={() => toggleSubmenu("Admission_Statistics")}
+                onClick={() => toggleSubmenu("Student_Attendence")}
               >
                 <FcStatistics className="text-sm" />
-                <span className="text-sm">Admission Statistics</span>
-                {openMenu === "Admission_Statistics" ? <FaChevronUp /> : <FaChevronDown />}
+                <span className="text-sm">Student Attendence</span>
+                {openMenu === "Student_Attendence" ? <FaChevronUp /> : <FaChevronDown />}
               </div>
-              {openMenu === "Admission_Statistics" && (
+              {openMenu === "Student_Attendence" && (
                 <ul className="absolute left-0 bg-white text-black mt-2 shadow-lg rounded z-50">
                   {[
-                    { label: "Branch wise Admissions", href: "/admission/adm_statistics_branch" },
-                    { label: "Category wise Admissions", href: "/admission/adm_statistics_category" },
-                    { label: "Quota wise Statistics", href: "/admission/adm_statistics_quota" },
-                    { label: "Rank Statistics", href: "/admission/adm_rank_statistics" },
+                    { label: "Mark Daily Attendence", href: "/admission/adm_statistics_branch" },
+                    { label: "Attendence Report", href: "/admission/adm_statistics_category" },
+                    { label: "Individual Attendence", href: "/admission/adm_statistics_quota" },
                   ].map((item) => (
                     <li
                       key={item.label}
@@ -139,17 +118,17 @@ const HorizontalNavbar: React.FC = () => {
               )}
             </li>
 
-            {/* VTU usno update */}
-            <li className="relative">
+            {/* CIE marks entry */}
+            <li className="relative border border-gray-300 rounded hover:border-blue-500">
               <div
                 className="flex items-center space-x-2 cursor-pointer hover:bg-blue-500 py-2 px-2 rounded"
-                onClick={() => toggleSubmenu("VTUUsnoUpdate")}
+                onClick={() => toggleSubmenu("CIE")}
               >
                 <GrUpdate  className="text-sm"/>
-                <span className="text-sm">COB/VTU USN Update</span>
-                {openMenu === "VTUUsnoUpdate" ? <FaChevronUp /> : <FaChevronDown />}
+                <span className="text-sm">CIE</span>
+                {openMenu === "CIE" ? <FaChevronUp /> : <FaChevronDown />}
               </div>
-              {openMenu === "VTUUsnoUpdate" && (
+              {openMenu === "CIE" && (
                 <ul className="absolute left-0 bg-white text-black mt-2 shadow-lg rounded z-50">
                   {[
                     { label: "Update COB Branch/USNO", href: "/admission/adm_cob_usno_brcode" },
@@ -166,17 +145,17 @@ const HorizontalNavbar: React.FC = () => {
               )}
             </li>
 
-            {/* Vertical Progression and Eligibility */}
-            <li className="relative">
+            {/* Mentee */}
+            <li className="relative border border-gray-300 rounded hover:border-blue-500">
               <div
                 className="flex items-center space-x-2 cursor-pointer hover:bg-blue-500 py-2 px-2 rounded"
-                onClick={() => toggleSubmenu("VerticalProgression")}
+                onClick={() => toggleSubmenu("Mentee")}
               >
                 <PiLadder className="text-sm" />
-                <span className="text-sm">Vertical Progression</span>
-                {openMenu === "VerticalProgression" ? <FaChevronUp /> : <FaChevronDown />}
+                <span className="text-sm">Mentee</span>
+                {openMenu === "Mentee" ? <FaChevronUp /> : <FaChevronDown />}
               </div>
-              {openMenu === "VerticalProgression" && (
+              {openMenu === "Mentee" && (
                 <ul className="absolute left-0 bg-white text-black mt-2 shadow-lg rounded z-50">
                   {[
                     { label: "Mark Dropout", href: "/admission/adm_dropout_mark" },
@@ -193,17 +172,17 @@ const HorizontalNavbar: React.FC = () => {
               )}
             </li>
 
-            {/* Admission Certificates */}
-            <li className="relative">
+            {/* Academics and R&D */}
+            <li className="relative border border-gray-300 rounded hover:border-blue-500">
               <div
                 className="flex items-center space-x-2 cursor-pointer hover:bg-blue-500 py-2 px-2 rounded"
-                onClick={() => toggleSubmenu("Admission_Certificates")}
+                onClick={() => toggleSubmenu("AcademicsR&D")}
               >
                 <GrCertificate className="text-sm" />
-                <span className="text-sm">Certificates</span>
-                {openMenu === "Admission_Certificates" ? <FaChevronUp /> : <FaChevronDown />}
+                <span className="text-sm">Academics and R&D</span>
+                {openMenu === "AcademicsR&D" ? <FaChevronUp /> : <FaChevronDown />}
               </div>
-              {openMenu === "Admission_Certificates" && (
+              {openMenu === "AcademicsR&D" && (
                 <ul className="absolute left-0 bg-white text-black mt-2 shadow-lg rounded z-50">
                   {[
                     { label: "Bonafied Certificate", href: "/admission/adm_certificate_bonafied" },
@@ -220,63 +199,17 @@ const HorizontalNavbar: React.FC = () => {
                 </ul>
               )}
             </li> 
-            {/* Contact */}
-            <li className="relative">
-              <div
-                className="flex items-center space-x-2 cursor-pointer hover:bg-blue-500 py-2 px-2 rounded"
-                onClick={() => toggleSubmenu("Contact")}
-              >
-                <MdOutlineContactPhone className="text-sm" />
-                <span className="text-sm">Contact</span>
-                {openMenu === "Contact" ? <FaChevronUp /> : <FaChevronDown />}
-              </div>
-              {openMenu === "Contact" && (
-                <ul className="absolute left-0 bg-white text-black mt-2 shadow-lg rounded z-50">
-                  {[
-                    { label: "E-mail", href: "/admission/adm_sendEmail" },
-                    { label: "Message", href: "/admission/adm_sendMessage" },
-                  ].map((item) => (
-                    <li
-                      key={item.label}
-                      className="hover:bg-gray-200 px-4 py-2 whitespace-nowrap"
-                    >
-                      <Link href={item.href}>{item.label}</Link>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </li>
-            {/* Settings */}
-            {user?.role === "adm_admin" && ( // Conditionally render the menu for Admin role
-              <li className="relative">
-                <div
-                  className="flex items-center space-x-2 cursor-pointer hover:bg-blue-500 py-2 px-2 rounded"
-                  onClick={() => toggleSubmenu("Settings")}
-                >
-                  <RiSettings5Line className="text-sm"/>
-                  <span className="text-sm">Settings</span>
-                  {openMenu === "Settings" ? <FaChevronUp /> : <FaChevronDown />}
+            {/* HoD role */}
+            {user?.role === "hod" && ( // Conditionally render the menu for Admin role
+              <li className="relative border border-gray-300 rounded hover:border-blue-500">
+              <Link href="/mis_hod/hod_home"> 
+                <div className="flex items-center space-x-2 cursor-pointer hover:bg-blue-500 py-2 px-2 rounded">
+                  <FaHome className="text-sm" />
+                  <span className="text-sm">HoD</span>
                 </div>
-                {openMenu === "Settings" && (
-                  <ul className="absolute left-0 bg-white text-black mt-2 shadow-lg rounded z-50">
-                    {[
-                      { label: "User Management", href: "/admission/adm_user_mgmt" },
-                      { label: "Student Intake Management", href: "/admission/adm_intake_fetch" },
-                      { label: "Branch Management", href: "/admission/adm_branch" },
-                      { label: "Save Old USNO", href: "/admission/adm_save_oldusno" },
-                      { label: "Mark Change of Branch", href: "/admission/adm_cob_mark" },
-                    ].map((item) => (
-                      <li
-                        key={item.label}
-                        className="hover:bg-gray-200 px-4 py-2 whitespace-nowrap"
-                      >
-                        <Link href={item.href}>{item.label}</Link>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </li> 
-              )}
+              </Link> 
+            </li>
+             )}
           </ul>
           
         )}

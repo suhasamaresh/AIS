@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import Header from '../ui/Header';
-import HorizontalNavbarAdmission from '../ui/navigation_bar/admission'; // Admission Navbar
-//import HorizontalNavbarAccounts from '../ui/navigation_bar/accounts'; // Accounts Navbar
+import HorizontalNavbarAdmission from './navigation_bar/admission_nav'; // Admission Navbar
+import HorizontalNavbarFaculty from '../ui/navigation_bar/deptfaculty_nav'; // Faculty Navbar
+import HorizontalNavbarHoD from '../ui/navigation_bar/hod_nav'; // HoD Navbar
+import HorizontalNavbarStudent from '../ui/navigation_bar/student_nav'; // student Navbar
+import HorizontalNavbarAccounts from '../ui/navigation_bar/accounts_nav'; // HoD Navbar
 import { useUser } from '../../context/usercontext';
 
 interface LayoutProps {
   children: React.ReactNode;
-  moduleType: 'admission' | 'accounts'; // Add module type prop
+  moduleType: 'admission' | 'accounts' | 'faculty' | 'hod' | 'student'; // Add module type prop
 }
 
 const Layout: React.FC<LayoutProps> = ({ children, moduleType }) => {
@@ -26,14 +29,23 @@ const Layout: React.FC<LayoutProps> = ({ children, moduleType }) => {
     if (moduleType === 'admission') {
       return <HorizontalNavbarAdmission />;
     }
-    /* if (moduleType === 'accounts') {
+    if (moduleType === 'faculty') {
+      return <HorizontalNavbarFaculty />;
+    }
+    if (moduleType === 'hod') {
+      return <HorizontalNavbarHoD />;
+    }
+    if (moduleType === 'student') {
+      return <HorizontalNavbarStudent />;
+    }
+    if (moduleType === 'accounts') {
       return <HorizontalNavbarAccounts />;
-    } */
+    }
     return null;
   };
 
   return (
-    <div className="flex flex-col h-screen w-screen">
+    <div className="flex flex-col min-h-screen min-w-screen">
       {/* Header */}
       <Header user={user} onLogout={handleLogout} /> 
       

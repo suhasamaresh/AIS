@@ -33,6 +33,7 @@ export const useUser = () => {
 "use client"
 import { createContext, useContext, useState, ReactNode } from "react";
 interface User {
+  usno: string;
   name: string;
   role: string;
   department: string;

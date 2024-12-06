@@ -7,43 +7,69 @@ import Image from "next/image";
 import drait from "@/app/assets/full_logo-wide.png";
 import { useRouter } from "next/navigation"; 
 import buddha from "./assets/buddha.jpg";
-import ImageWithAltCenter from './components/image_with_center';
+import ImageWithAltCenter from "./components/image_with_center";
 
 const LoginPage = () => {
   const { setUser } = useUser();
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
+  const [loginType, setLoginType] = useState<"Student" | "Faculty">("Student"); // Default login type
   const router = useRouter();
 
   const handleLogin = async () => {
-    const response = await fetch("/api/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId, password }),
-    });
-    const data = await response.json();
-
-    if (data.success) {
-      setUser({ name: data.name, role: data.role, department: data.department });
+    // Determine the API endpoint based on login type
+    const apiEndpoint = loginType === "Faculty" ? "/api/login_user_staff" : "/api/login_user_student";
+  
+    try {
+      // Make the API call
+      const response = await fetch(apiEndpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, password }),
+      });
       
-      // Redirect based on the department
-      if (data.department === 'Admission') {
-        router.push("/admission/adm_home");
+      const data = await response.json();
+  
+      if (data.success) {
+        // Set user context with the retrieved data
+          setUser({ usno: data.usno, name: data.name, role: data.role, department: data.department });
+        
+        // Redirect based on the login type and role
+        if (loginType === "Faculty") {
+          if (data.role === "faculty") {
+            router.push("/mis_faculty/faculty_home");
+          } 
+          else if (data.role === "hod") {
+            router.push("/mis_hod/hod_home");
+          } 
+          else if (data.role === "admission" || data.role === "adm_admin") {
+            router.push("/mis_admission/adm_home");
+          }
+          else if (data.role === "accounts" || data.role === "acc_admin") {
+            router.push("/mis_accounts/accounts_home");
+          }
+        } else if (loginType === "Student") {
+          router.push("/mis_student/student_home");
+        }
+      } else {
+        alert("Invalid credentials");
       }
-    } else {
-      alert("Invalid credentials");
+    } catch (error) {
+      console.error("Login failed:", error);
+      alert("An error occurred while logging in. Please try again.");
     }
   };
+  
 
-  return (   
+  return (
     <div className="min-h-screen flex flex-col items-center justify-start pt-24 bg-gray-50">
       <header className="bg-gradient-to-r fixed from-white from-25% via-blue-500 to-purple-600 flex items-center justify-between px-4 py-2 top-0 left-0 z-50 w-full">
         <Image src={drait} width={400} height={500} alt="drait logo wide" />
       </header>
 
-      <div className="flex flex-col items-center  space-y-6">
+      <div className="flex flex-col items-center space-y-6">
         {/* Centered Image */}
-        <ImageWithAltCenter   src={buddha} alt="Image Not Available" />
+        <ImageWithAltCenter src={buddha} alt="Image Not Available" />
 
         {/* Centered Heading */}
         <h2 className="text-2xl font-bold text-center">Management Information System</h2>
@@ -51,6 +77,31 @@ const LoginPage = () => {
         {/* Centered Form */}
         <div className="w-full max-w-md p-6 bg-white rounded shadow-2xl">
           <h2 className="text-2xl font-bold text-center mb-6">Login</h2>
+          
+          {/* Login Type Selection */}
+          <div className="flex justify-center space-x-4 mb-4">
+            <label className="flex items-center space-x-2">
+              <input
+                type="radio"
+                value="Student"
+                checked={loginType === "Student"}
+                onChange={() => setLoginType("Student")}
+                className="form-radio"
+              />
+              <span>Student Login</span>
+            </label>
+            <label className="flex items-center space-x-2">
+              <input
+                type="radio"
+                value="Faculty"
+                checked={loginType === "Faculty"}
+                onChange={() => setLoginType("Faculty")}
+                className="form-radio"
+              />
+              <span>Faculty Login</span>
+            </label>
+          </div>
+
           <input
             type="text"
             value={userId}

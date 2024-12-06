@@ -4,24 +4,26 @@ import Image from 'next/image';
 import drait from '@/app/assets/full_logo-wide.png';
 
 interface HeaderProps {
-  user: { name: string; role: string; department: string } | null;
+  user: { usno: string; name: string; role: string; department: string } | null;
   onLogout: () => void;
 }
 
 const Header: React.FC<HeaderProps> = ({ user, onLogout }) => {
   // Initialize state from sessionStorage directly
-  const [sessionUser, setSessionUser] = useState<{ name: string; department: string; role: string } | null>(() => {
+  const [sessionUser, setSessionUser] = useState<{ usno: string; name: string; department: string; role: string } | null>(() => {
+    const savedUSNO = sessionStorage.getItem('usno');
     const savedUserName = sessionStorage.getItem('userName');
     const savedDepartmentName = sessionStorage.getItem('departmentName');
     const savedRole = sessionStorage.getItem('userRole');
-    return savedUserName && savedDepartmentName && savedRole
-      ? { name: savedUserName, department: savedDepartmentName, role: savedRole }
+    return  savedUSNO && savedUserName && savedDepartmentName && savedRole
+      ? { usno: savedUSNO, name: savedUserName, department: savedDepartmentName, role: savedRole }
       : null;
   });
 
   // Sync sessionUser with user prop
   useEffect(() => {
     if (user) {
+      sessionStorage.setItem('usno', user.usno);
       sessionStorage.setItem('userName', user.name);
       sessionStorage.setItem('departmentName', user.department);
       sessionStorage.setItem('userRole', user.role);
@@ -31,6 +33,7 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout }) => {
 
   // Handle logout and clear session storage and state
   const handleLogout = () => {
+    sessionStorage.removeItem('usno');
     sessionStorage.removeItem('userName');
     sessionStorage.removeItem('departmentName');
     sessionStorage.removeItem('userRole');
