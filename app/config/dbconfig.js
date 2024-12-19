@@ -1,6 +1,6 @@
 
 const sql = require("mssql");
-
+/*
 const config = {
   server : "192.168.29.12\\CHIDUSQL", 
   port: 1433,
@@ -11,19 +11,19 @@ const config = {
     encrypt: false,
     trustServerCertificate: true,
     },
-};
+}; */
 
- /* const config = {
+  const config = {
   user: 'sa',
   password: 'deane',
-  server: '38.188.203.50', // IP address of the server
+  server: '', // IP address of the server
   port: 1433,
   database: 'aittest',
   options: {
     encrypt: true, // depending on your SQL Server version
     trustServerCertificate: true,    
   },
-};   */
+};   
 
  async function connectToDatabase() {
   try {

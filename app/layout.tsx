@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { UserProvider } from "../app/context/usercontext"; // Adjust the import path as necessary
 import type { AppProps } from "next/app";
+import Header from "./components/nav";
 
 
 const geistSans = localFont({
@@ -35,6 +36,7 @@ export default function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
+          <Header title="Dr Ambedkar Institute of Technology" />
           {children}
         </body>
       </html>
