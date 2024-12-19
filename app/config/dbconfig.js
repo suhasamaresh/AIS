@@ -16,7 +16,7 @@ const config = {
   const config = {
   user: 'sa',
   password: 'deane',
-  server: '', // IP address of the server
+  server: '38.188.203.50', // IP address of the server
   port: 1433,
   database: 'aittest',
   options: {

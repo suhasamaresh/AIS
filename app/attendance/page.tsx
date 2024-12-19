@@ -30,7 +30,7 @@ export default function Home() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch('/api/get_faculty_courses');
+                const response = await fetch('/api/get_faculty_courses?employeeId=CSU09');
                 if (!response.ok) {
                     throw new Error("Failed to fetch courses");
                 }
@@ -43,7 +43,7 @@ export default function Home() {
 
         const fetchFacultyName = async () => {
             try {
-                const response = await fetch('/api/fetch_faculty_name');
+                const response = await fetch('/api/fetch_faculty_name?employeeID=CSU09');
                 if (!response.ok) {
                     throw new Error("Failed to fetch faculty name");
                 }

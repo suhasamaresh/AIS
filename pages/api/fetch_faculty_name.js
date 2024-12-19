@@ -3,11 +3,12 @@ import sql from 'mssql';
 
 export default async function handler(req, res) {
   try {
+    const { employeeID } = req.query; // Get employee ID from query parameters
     const pool = await connectToDatabase();
 
     // Fetch courses mapped to the given employee ID (CSU20)
     const results = await pool.request()
-        .input('employeeID', sql.VarChar, 'CSU09') // Input parameter for employee ID
+        .input('employeeID', sql.VarChar, employeeID) // Input parameter for employee ID
       .query(`USE aittest;
         SELECT  [FACULTY_NAME]
         FROM [dbo].[facultyData]
