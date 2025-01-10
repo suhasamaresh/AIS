@@ -63,45 +63,46 @@ export default function RecommendedStudents() {
   };
 
   // Update Condonation Status
-  const handleUpdate = async () => {
-    setLoading(true);
+ const handleUpdate = async () => {
+  setLoading(true);
 
-    const payload = {
-      students: students.map((student) => ({
-        usn: student.usn,
-        sem: selectedSem,
-        result_year: resultYear,
-        sub_code: student.sub_code,
-        br_code: 'CS',
-        condonation_status: student.status === "A" ? "Approved" : "Recommended",
-      })),
-    };
-
-    console.log("Sending payload:", payload);
-
-    try {
-      const response = await fetch(`/api/update_condonation_status`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload), // Send payload in body
-      });
-
-      if (response.ok) {
-        alert("Condonation status updated successfully.");
-        fetchStudents();
-      } else {
-        const result = await response.json();
-        setError(result.error || "Failed to update status.");
-      }
-    } catch (error) {
-      console.error("Error updating condonation status:", error);
-      setError("Failed to update status.");
-    } finally {
-      setLoading(false);
-    }
+  const payload = {
+    students: students.map((student) => ({
+      usn: student.usn,
+      sem: selectedSem,
+      sub_code: student.sub_code,
+      result_year: resultYear,
+      br_code: selectedBranch,
+      condonation_status: student.condonation_status == "A" ? "Approved" : "Rejected",
+    })),
   };
+
+  console.log("Sending payload:", payload);
+
+  try {
+    const response = await fetch(`/api/update_condonation_status`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (response.ok) {
+      alert("Condonation status updated successfully.");
+      fetchStudents(); // Refresh the list after update
+    } else {
+      const result = await response.json();
+      setError(result.error || "Failed to update status.");
+    }
+  } catch (error) {
+    console.error("Error updating condonation status:", error);
+    setError("Failed to update status.");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   // Fetch students when filters change
   useEffect(() => {
@@ -110,10 +111,16 @@ export default function RecommendedStudents() {
 
   const handleToggle = (index: number) => {
     const updatedStudents = [...students];
-    updatedStudents[index].status =
-      updatedStudents[index].status === "A" ? "NA" : "A";
+    const student = updatedStudents[index];
+  
+    // Toggle the condonation status and the frontend status
+    student.status = student.status === "A" ? "NA" : "A";
+    student.condonation_status =
+      student.status === "A" ? "Approved" : "Not Approved";
+  
     setStudents(updatedStudents);
   };
+  
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center p-6 w-full">
@@ -196,11 +203,11 @@ export default function RecommendedStudents() {
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
                         type="checkbox"
-                        checked={student.status === "A"}
+                        checked={student.status === "NA"}
                         onChange={() => handleToggle(index)}
                         className="sr-only peer"
                       />
-                      <div className="w-16 h-8 bg-red-500 peer-checked:bg-green-500 rounded-full after:content-['NA'] after:absolute after:top-1 after:left-1 after:bg-white after:rounded-full after:h-6 after:w-6 peer-checked:after:translate-x-8 peer-checked:after:content-['A']" />
+                      <div className="w-16 h-8 bg-green-500 peer-checked:bg-red-500 rounded-full after:content-['A'] after:absolute after:top-1 after:left-1 after:bg-white after:rounded-full after:h-6 after:w-6 peer-checked:after:translate-x-8 peer-checked:after:content-['NA']" />
                     </label>
                   </td>
                 </tr>
