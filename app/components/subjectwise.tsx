@@ -20,7 +20,7 @@ export default function SubjectDashboard() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [branchCode, setBranchCode] = useState<string>("CS");
-  const [resultYear, setResultYear] = useState<string>("2024-01-06");
+  const [resultYear, setResultYear] = useState<string>("2025-01-01");
   const [selectedSem, setSelectedSem] = useState<string>("1"); // Default semester is 5
   const [selectedSubCode, setSelectedSubCode] = useState<string | null>(null);
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { set } from "date-fns";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import SubjectDashboard from "./subjectwise";
 
 interface AttendanceRecord {
@@ -32,7 +32,7 @@ export default function AttendanceDashboard() {
     new Date().toISOString().split("T")[0]
   );
   const [branchCode, setBranchCode] = useState<string>("CS");
-  const [resultYear, setResultYear] = useState<string>("2024-01-06");
+  const [resultYear, setResultYear] = useState<string>("2025-01-01");
   const [selectedSem, setSelectedSem] = useState<string>("5"); // Default semester is 5
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [activeOption, setActiveOption] = useState<string>("Studentwise");
@@ -40,6 +40,8 @@ export default function AttendanceDashboard() {
   const [studentUSN, setStudentUSN] = useState<string>("");
   const [studentSem, setStudentSem] = useState<string>("");
   const [studentSec, setStudentSec] = useState<string>("");
+  const [isModalOpen, setIsModalOpen] = useState(true);
+  const printRef = useRef<HTMLDivElement>(null);
 
   const [selectedStudent, setSelectedStudent] = useState<StudentRecord | null>(
     null
@@ -157,34 +159,25 @@ export default function AttendanceDashboard() {
     setSelectedStudent(null); // Clear selected student data
   };
 
+  // Print Functionality
+  const handlePrint = () => {
+    if (printRef.current) {
+      const printContent = printRef.current.innerHTML;
+      const originalContent = document.body.innerHTML;
+
+      document.body.innerHTML = printContent;
+      window.print();
+      document.body.innerHTML = originalContent;
+      window.location.reload(); // Ensure UI returns to normal after printing
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center p-6 w-full">
       {/* Title */}
       <h1 className="text-3xl font-semibold text-gray-800 mb-6">
         HOD Attendance Dashboard
       </h1>
-
-      {/* Semester Dropdown */}
-      <div className="mb-8">
-        <label htmlFor="semester-dropdown" className="mr-2">
-          Select Semester:
-        </label>
-        <select
-          id="semester-dropdown"
-          value={selectedSem}
-          onChange={(e) => setSelectedSem(e.target.value)}
-          className="px-4 py-2 rounded border"
-        >
-          <option value="1">Semester 1</option>
-          <option value="2">Semester 2</option>
-          <option value="3">Semester 3</option>
-          <option value="4">Semester 4</option>
-          <option value="5">Semester 5</option>
-          <option value="6">Semester 6</option>
-          <option value="7">Semester 7</option>
-          <option value="8">Semester 8</option>
-        </select>
-      </div>
 
       {/* View Option Dropdown */}
       <div className="mb-8 flex space-x-4">
@@ -221,6 +214,26 @@ export default function AttendanceDashboard() {
       {/* Display Student-wise data */}
       {activeOption === "Studentwise" && tableOpen === true && (
         <div className="overflow-x-auto mx-auto max-w-7xl px-8">
+          <div className="mb-8">
+            <label htmlFor="semester-dropdown" className="mr-2">
+              Select Semester:
+            </label>
+            <select
+              id="semester-dropdown"
+              value={selectedSem}
+              onChange={(e) => setSelectedSem(e.target.value)}
+              className="px-4 py-2 rounded border"
+            >
+              <option value="1">Semester 1</option>
+              <option value="2">Semester 2</option>
+              <option value="3">Semester 3</option>
+              <option value="4">Semester 4</option>
+              <option value="5">Semester 5</option>
+              <option value="6">Semester 6</option>
+              <option value="7">Semester 7</option>
+              <option value="8">Semester 8</option>
+            </select>
+          </div>
           {loading ? (
             <div className="text-center">
               <p>Loading student data...</p>
@@ -333,7 +346,7 @@ export default function AttendanceDashboard() {
           </div>
           <div className="flex justify-end space-x-4 mt-8">
             <button
-              onClick={() => window.print()}
+              onClick={() => setIsModalOpen(true)}
               className="bg-green-600 text-white px-4 py-2 rounded-lg"
             >
               Print
@@ -381,9 +394,139 @@ export default function AttendanceDashboard() {
               Export as CSV
             </button>
           </div>
+
+          {isModalOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-50">
+              <div className="bg-white rounded-lg shadow-lg w-11/12 max-w-4xl max-h-[90vh] overflow-hidden">
+                {/* Modal Header */}
+                <div className="flex justify-between items-center border-b p-4">
+                  <h2 className="text-xl font-bold">Attendance Data</h2>
+                  <button
+                    onClick={() => setIsModalOpen(false)}
+                    className="mb-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                  >
+                    &times;
+                  </button>
+                </div>
+
+                {/* Modal Content (Scrollable) */}
+                <div className="p-4 overflow-auto max-h-[70vh]" ref={printRef}>
+                  {/* Header Section */}
+                  <div className="flex items-start mb-2">
+                    <div className="flex-shrink-0">
+                      <img
+                        id="logo"
+                        src="/DrAIT_logo.png"
+                        alt="AIT Logo"
+                        className="mt-0 h-20 w-20 object-contain"
+                      />
+                    </div>
+                    <div className="ml-4 text-center">
+                      <h3 className="text-xl font-bold">
+                        Dr. Ambedkar Institute of Technology
+                      </h3>
+                      <p className="text-sm">
+                        (An Autonomous Institution, Aided by Government of
+                        Karnataka)
+                      </p>
+                      <p className="text-sm">
+                        Affiliated to Visvesvaraya Technological University,
+                        Belgaum & Approved by AICTE, New Delhi
+                      </p>
+                      <p className="text-sm">
+                        BDA Outer Ring Road, Near Jnana Bharathi Campus,
+                        Mallathahalli, Bengaluru-560056, Karnataka
+                      </p>
+                      <h4 className="text-lg font-semibold mb-1">
+                        Department of CSE
+                      </h4>
+                      <p>
+                        <u>Attendance Report</u>
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center text-sm mb-4">
+                    <p>
+                      <strong>USN:</strong> {studentUSN}
+                    </p>
+                    <p>
+                      <strong>Name:</strong> {studentName}
+                    </p>
+                    <p>
+                      <strong>Semester:</strong> {studentSem}
+                    </p>
+                    <p>
+                      <strong>Section:</strong> {studentSec}
+                    </p>
+                  </div>
+
+                  <table className="w-full border-collapse border border-gray-400">
+                    <thead>
+                      <tr>
+                        <th className="border border-gray-400 px-1 py-1 text-xs">
+                          Subject Code
+                        </th>
+                        <th className="border border-gray-400 px-1 py-1 text-xs">
+                          Total Classes Held
+                        </th>
+                        <th className="border border-gray-400 px-1 py-1 text-xs">
+                          Classes Attended
+                        </th>
+                        <th className="border border-gray-400 px-1 py-1 text-xs">
+                          Attendance Percentage
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {attendanceDetails.map((attendance, index) => (
+                        <tr key={attendance.sub_code + index}>
+                          <td className="border border-gray-400 px-1 py-1 text-xs">
+                            {attendance.sub_code}
+                          </td>
+                          <td className="border border-gray-400 px-1 py-1 text-xs">
+                            {attendance.TotalClassesHeld}
+                          </td>
+                          <td className="border border-gray-400 px-1 py-1 text-xs">
+                            {attendance.ClassesAttended}
+                          </td>
+                          <td className="border border-gray-400 px-1 py-1 text-xs">
+                            {attendance.AttendancePercentage}%
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Modal Footer */}
+                <div className="flex justify-between items-center p-4 border-t">
+                  <div className="text-right">
+                    <p className="text-sm">HOD, Department of CSE</p>
+                    <p className="text-sm">Signature: __________________</p>
+                  </div>
+                  <div className="flex space-x-4">
+                    <button
+                      onClick={handlePrint}
+                      className="p-2 bg-green-500 hover:bg-green-600 text-white rounded"
+                    >
+                      PRINT
+                    </button>
+                    <button
+                      onClick={() => setIsModalOpen(false)}
+                      className="p-2 bg-gray-300 hover:bg-gray-400 rounded"
+                    >
+                      CLOSE
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
-      {activeOption === "Subjectwise" && tableOpen === true && (<SubjectDashboard />)}
+      {activeOption === "Subjectwise" && tableOpen === true && (
+        <SubjectDashboard />
+      )}
     </div>
   );
 }

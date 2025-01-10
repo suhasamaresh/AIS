@@ -1,16 +1,6 @@
 "use client";
 
-import AttendanceTable from "@/app/components/detailedattendance";
-import {
-  useState,
-  useEffect,
-  AwaitedReactNode,
-  JSXElementConstructor,
-  Key,
-  ReactElement,
-  ReactNode,
-  ReactPortal,
-} from "react";
+import { useState, useEffect } from "react";
 import { FaSearch as Search, FaTimes as X } from "react-icons/fa";
 
 // Sample data: Array of student objects
@@ -46,10 +36,10 @@ export default function Page() {
   const [activeOption, setActiveOption] = useState("Student");
   const [students, setStudents] = useState<student[]>([]); // Set initial data as sample
   const classInfo = {
-    subject: "ME",
-    subjectCode: "22CSU501",
-    faculty: "Dr Nandini N",
-    facultyId: "CSU07",
+    subject: "CGIP",
+    subjectCode: "22CSU502",
+    faculty: "Vinod Kumar KP",
+    facultyId: "CSU20",
   };
 
   const [selectedDate, setSelectedDate] = useState("");
@@ -71,6 +61,7 @@ export default function Page() {
   const pathname = usePathname();
   const slug = pathname ? pathname.split("/").pop() : "";
   const [searchs, SetSearchs] = useState<any[]>([]);
+  const [isDisabled, setIsDisabled] = useState(false);
 
   const decode = (encoded: string) => {
     const decoded = atob(encoded);
@@ -85,7 +76,7 @@ export default function Page() {
   const fetchdetailedreport = async () => {
     try {
       const response = await fetch(
-        `/api/detailed_report?sub_code=${subjectcode}&facultyId=CSU09`
+        `/api/detailed_report?sub_code=${subjectcode}&facultyId=CSU20`
       ); // Replace with your API endpoint
       if (!response.ok) {
         throw new Error("Failed to fetch attendance data");
@@ -102,7 +93,7 @@ export default function Page() {
   const fetchstudentdetails = async () => {
     try {
       const response = await fetch(
-        `/api/consolidated_query?sub_code=${subjectcode}&section=${section}&facultyId=CSU09`
+        `/api/consolidated_query?sub_code=${subjectcode}&section=${section}&facultyId=CSU20`
       );
       const data = await response.json();
       console.log(data);
@@ -115,7 +106,7 @@ export default function Page() {
   const fetchStudents = async () => {
     try {
       const response = await fetch(
-        `/api/get_course_students?subjectCode=${subjectcode}&section=${section}&facultyId=CSU09`
+        `/api/get_course_students?subjectCode=${subjectcode}&section=${section}&facultyId=CSU20`
       );
       const data = await response.json();
       const studentsWithDefaultStatus = data.students.map(
@@ -147,7 +138,7 @@ export default function Page() {
         faculty_id: classInfo.facultyId,
         dept: "CS", // Example department (replace with actual value)
         sem: 5, // Example semester (replace with actual value)
-        year: new Date(selectedDate).getFullYear(), // Use the year from the selected date
+        year: "2025-01-01", // Use the year from the selected date
         Date: selectedDate,
         timePeriod: selectedTimePeriod,
         attendanceData,
@@ -237,10 +228,11 @@ export default function Page() {
         `/api/fetch_attendance_flag?date=${selectedDate}&timePeriod=${selectedTimePeriod}`
       );
       const data = await response.json();
-      setFlag(data);
-      // console.log(data);
+      setFlag(data?.flag || null); // Use the appropriate key from the API response
+      console.log("Fetched Flag:", data?.flag || null);
     } catch (error) {
-      console.error("Error fetching student details:", error);
+      console.error("Error fetching attendance flag:", error);
+      setFlag([]); // Reset the flag on error
     }
   };
 
@@ -305,6 +297,22 @@ export default function Page() {
     SetCode(subjectcode);
     setSect(section);
   }, [attendanceFilter, searchTerm, students]);
+
+  useEffect(() => {
+    const fetchAndSetFlag = async () => {
+      await fetchflag(); // Fetch the flag
+      if (flag) {
+        setIsDisabled(true);
+      } else {
+        setIsDisabled(false);
+      }
+      console.log("Flag after fetching:", flag);
+    };
+
+    if (selectedDate && selectedTimePeriod) {
+      fetchAndSetFlag(); // Only fetch if date and time period are selected
+    }
+  }, [selectedDate, selectedTimePeriod, flag]);
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center p-6 w-full">
@@ -371,27 +379,106 @@ export default function Page() {
           <div className="flex justify-end space-x-4 mt-8">
             <button
               onClick={() => {
-                const printContent =
-                  document.querySelector(".w-full.max-w-6xl");
+                // Create a custom print layout
                 const printWindow = window.open("", "", "width=800,height=600");
-                if (printWindow && printContent) {
-                  printWindow.document.write(`
-                <html>
-                <head>
-                <title>Print</title>
-                <style>
-                  body { font-family: Arial, sans-serif; }
-                  table { width: 100%; border-collapse: collapse; }
-                  th, td { border: 1px solid #ddd; padding: 8px; }
-                  th { background-color: #f2f2f2; }
-                </style>
-                </head>
-                <body>
-                ${document.querySelector(".text-center")?.innerHTML}
-                ${printContent.innerHTML}
-                </body>
-                </html>
-                `);
+                if (printWindow) {
+                  const printContent = `
+        <html>
+          <head>
+            <title>Attendance Report</title>
+            <style>
+              body {
+                font-family: Arial, sans-serif;
+                margin: 20px;
+              }
+              h1, h2, h3 {
+                text-align: center;
+              }
+              table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+              }
+              th, td {
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: center;
+              }
+              th {
+                background-color: #f2f2f2;
+              }
+              .header-section {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+              }
+              .header-section img {
+                height: 80px;
+              }
+              .info-section {
+                text-align: center;
+                margin: 20px 0;
+              }
+              .info-section p {
+                font-size: 16px;
+                margin: 4px 0;
+              }
+              .footer {
+                margin-top: 20px;
+                text-align: right;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="header-section">
+              <div>
+                <img src="/image/DrAIT_logo.png" alt="AIT Logo">
+              </div>
+              <div>
+                <h1>Dr. Ambedkar Institute of Technology</h1>
+                <p>(An Autonomous Institution, Aided by Government of Karnataka)</p>
+                <p>Affiliated to VTU, Belgaum & Approved by AICTE, New Delhi</p>
+                <p>BDA Outer Ring Road, Mallathahalli, Bengaluru-560056, Karnataka</p>
+              </div>
+            </div>
+            <h2>Department of CSE</h2>
+            <div class="info-section">
+              <p><strong>Subject Code:</strong> ${subjectcode}</p>
+              <p><strong>Section:</strong> ${sect}</p>
+              <p><strong>Student List</strong></p>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Sl No</th>
+                  <th>USN</th>
+                  <th>Name</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${students
+                  .map(
+                    (student, index) => `
+                  <tr>
+                    <td>${index + 1}</td>
+                    <td>${student.USN}</td>
+                    <td>${student.S_NAME}</td>
+                  </tr>
+                `
+                  )
+                  .join("")}
+              </tbody>
+            </table>
+            <div class="footer">
+              <p>HOD, Department of CSE</p>
+              <p>Signature: __________________</p>
+            </div>
+          </body>
+        </html>
+      `;
+
+                  printWindow.document.write(printContent);
                   printWindow.document.close();
                   printWindow.print();
                 }
@@ -400,6 +487,7 @@ export default function Page() {
             >
               Print
             </button>
+
             <button
               onClick={() => {
                 const csvContent = [
@@ -549,22 +637,25 @@ export default function Page() {
 
             {/* Submit Button */}
             <div className="text-right">
-              <button
-                type="button"
-                onClick={handleSubmit}
-                className={`bg-blue-600 text-white px-4 py-2 rounded-lg ${
-                  selectedDate !== new Date().toISOString().split("T")[0] ||
-                  !selectedTimePeriod
-                    ? "opacity-50 cursor-not-allowed"
-                    : ""
-                }`}
-                disabled={
-                  selectedDate !== new Date().toISOString().split("T")[0] ||
-                  !selectedTimePeriod
-                }
-              >
-                Submit Attendance
-              </button>
+              <div className="text-right">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const confirmSubmit = window.confirm(
+                      "Are you sure you want to submit the attendance?"
+                    );
+                    if (confirmSubmit) {
+                      handleSubmit(); // Call the existing submit handler
+                    }
+                  }}
+                  className={`bg-blue-600 text-white px-4 py-2 rounded-lg ${
+                    isDisabled ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                  disabled={isDisabled}
+                >
+                  Submit Attendance
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -702,11 +793,129 @@ export default function Page() {
                         {/* Print and Export Buttons */}
                         <div className="flex justify-end space-x-4 mt-8">
                           <button
-                            onClick={() => window.print()}
+                            onClick={() => {
+                              const printWindow = window.open(
+                                "",
+                                "",
+                                "width=800,height=600"
+                              );
+                              if (printWindow) {
+                                const printContent = `
+        <html>
+          <head>
+            <title>Consolidated Attendance Report</title>
+            <style>
+              body {
+                font-family: Arial, sans-serif;
+                margin: 20px;
+              }
+              h1, h2, h3 {
+                text-align: center;
+              }
+              table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+              }
+              th, td {
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: center;
+              }
+              th {
+                background-color: #f2f2f2;
+              }
+              .header-section {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+              }
+              .header-section img {
+                height: 80px;
+              }
+              .info-section {
+                text-align: center;
+                margin: 20px 0;
+              }
+              .info-section p {
+                font-size: 16px;
+                margin: 4px 0;
+              }
+              .footer {
+                margin-top: 20px;
+                text-align: right;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="header-section">
+              <div>
+                <img src="/image/DrAIT_logo.png" alt="AIT Logo">
+              </div>
+              <div>
+                <h1>Dr. Ambedkar Institute of Technology</h1>
+                <p>(An Autonomous Institution, Aided by Government of Karnataka)</p>
+                <p>Affiliated to VTU, Belgaum & Approved by AICTE, New Delhi</p>
+                <p>BDA Outer Ring Road, Mallathahalli, Bengaluru-560056, Karnataka</p>
+              </div>
+            </div>
+            <h2>Department of CSE</h2>
+            <div class="info-section">
+              <p><strong>Course:</strong> ${classInfo.subject}</p>
+              <p><strong>Course ID:</strong> ${classInfo.subjectCode}</p>
+              <p><strong>Faculty:</strong> ${classInfo.faculty}</p>
+              <p><strong>Consolidated Attendance Report</strong></p>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>SL NO</th>
+                  <th>USN</th>
+                  <th>Name</th>
+                  <th>Classes Held</th>
+                  <th>Classes Attended</th>
+                  <th>Attendance %</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${filterStudentsByAttendance(studentdetails, attendanceFilter)
+                  .filter(
+                    (student) => student.Name !== null && student.Name !== ""
+                  )
+                  .map(
+                    (student, index) => `
+                  <tr>
+                    <td>${index + 1}</td>
+                    <td>${student.usn}</td>
+                    <td>${student.Name}</td>
+                    <td>${student.TotalClassesHeld}</td>
+                    <td>${student.ClassesAttended}</td>
+                    <td>${student.AttendancePercentage}%</td>
+                  </tr>
+                `
+                  )
+                  .join("")}
+              </tbody>
+            </table>
+            <div class="footer">
+              <p>HOD, Department of CSE</p>
+              <p>Signature: __________________</p>
+            </div>
+          </body>
+        </html>
+      `;
+
+                                printWindow.document.write(printContent);
+                                printWindow.document.close();
+                                printWindow.print();
+                              }
+                            }}
                             className="bg-green-600 text-white px-4 py-2 rounded-lg"
                           >
                             Print
                           </button>
+
                           <button
                             onClick={() => {
                               const csvContent = [
@@ -823,11 +1032,137 @@ export default function Page() {
                   </table>
                   <div className="flex justify-end space-x-4 mt-8">
                     <button
-                      onClick={() => window.print()}
+                      onClick={() => {
+                        const printWindow = window.open(
+                          "",
+                          "",
+                          "width=800,height=600"
+                        );
+                        if (printWindow) {
+                          const printContent = `
+        <html>
+          <head>
+            <title>Detailed Attendance Report</title>
+            <style>
+              body {
+                font-family: Arial, sans-serif;
+                margin: 20px;
+              }
+              h1, h2, h3 {
+                text-align: center;
+              }
+              table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+              }
+              th, td {
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: center;
+              }
+              th {
+                background-color: #f2f2f2;
+              }
+              .header-section {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+              }
+              .header-section img {
+                height: 80px;
+              }
+              .info-section {
+                text-align: center;
+                margin: 20px 0;
+              }
+              .info-section p {
+                font-size: 16px;
+                margin: 4px 0;
+              }
+              .footer {
+                margin-top: 20px;
+                text-align: right;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="header-section">
+              <div>
+                <img src="/image/DrAIT_logo.png" alt="AIT Logo">
+              </div>
+              <div>
+                <h1>Dr. Ambedkar Institute of Technology</h1>
+                <p>(An Autonomous Institution, Aided by Government of Karnataka)</p>
+                <p>Affiliated to VTU, Belgaum & Approved by AICTE, New Delhi</p>
+                <p>BDA Outer Ring Road, Mallathahalli, Bengaluru-560056, Karnataka</p>
+              </div>
+            </div>
+            <h2>Department of CSE</h2>
+            <div class="info-section">
+              <p><strong>Subject Code:</strong> ${subjectcode}</p>
+              <p><strong>Section:</strong> ${sect}</p>
+              <p><strong>Detailed Attendance Report</strong></p>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Sl. No</th>
+                  <th>USN</th>
+                  <th>Name</th>
+                  ${attendanceData
+                    .map(
+                      (item) =>
+                        `<th>${
+                          new Date(item.date).toISOString().split("T")[0]
+                        } <br /> ${item.timePeriod}</th>`
+                    )
+                    .join("")}
+                </tr>
+              </thead>
+              <tbody>
+                ${students
+                  .map(
+                    (student, index) => `
+                  <tr>
+                    <td>${index + 1}</td>
+                    <td>${student.USN}</td>
+                    <td>${student.S_NAME}</td>
+                    ${attendanceData
+                      .map((item) => {
+                        const studentForDateTime = item.attendance.find(
+                          (attendance) => attendance.usn === student.USN
+                        );
+                        return `<td>${
+                          studentForDateTime ? studentForDateTime.status : "-"
+                        }</td>`;
+                      })
+                      .join("")}
+                  </tr>
+                `
+                  )
+                  .join("")}
+              </tbody>
+            </table>
+            <div class="footer">
+              <p>HOD, Department of CSE</p>
+              <p>Signature: __________________</p>
+            </div>
+          </body>
+        </html>
+      `;
+
+                          printWindow.document.write(printContent);
+                          printWindow.document.close();
+                          printWindow.print();
+                        }
+                      }}
                       className="bg-green-600 text-white px-4 py-2 rounded-lg"
                     >
                       Print
                     </button>
+
                     <button
                       onClick={() => {
                         const csvContent = [
